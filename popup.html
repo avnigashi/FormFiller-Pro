@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Advanced Input Prefiller</title>
+  <style>
+    body { width: 400px; padding: 10px; font-family: Arial, sans-serif; }
+    .input-group { margin-bottom: 10px; }
+    input, button { margin: 5px 0; }
+    input[type="text"] { width: 45%; }
+    #prefill-list { margin-top: 20px; max-height: 300px; overflow-y: auto; }
+    .prefill-item { border: 1px solid #ccc; padding: 5px; margin-bottom: 5px; }
+    .delete-btn, .edit-btn { margin-left: 5px; }
+    .btn { background-color: #4CAF50; color: white; border: none; padding: 10px; cursor: pointer; }
+    .btn-danger { background-color: #f44336; }
+    .btn-secondary { background-color: #008CBA; }
+    .switch { position: relative; display: inline-block; width: 60px; height: 34px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+    .slider:before { position: absolute; content: ""; height: 26px; width: 26px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+    input:checked + .slider { background-color: #2196F3; }
+    input:checked + .slider:before { transform: translateX(26px); }
+    .error { color: red; margin-top: 5px; }
+  </style>
+</head>
+<body>
+  <h2>Advanced Input Prefiller</h2>
+  <label class="switch">
+    <input type="checkbox" id="toggle-extension">
+    <span class="slider"></span>
+  </label>
+  <span id="toggle-status">Extension Enabled</span>
+  <div class="input-group">
+    <input type="text" id="selector" placeholder="CSS Selector">
+    <input type="text" id="value" placeholder="Value to prefill">
+    <button id="add" class="btn">Add</button>
+  </div>
+  <div id="error-message" class="error"></div>
+  <input type="text" id="search" placeholder="Search rules...">
+  <button id="save-current" class="btn">Save All Current Inputs</button>
+  <button id="remove-all" class="btn btn-danger">Remove All</button>
+  <button id="export-rules" class="btn btn-secondary">Export Rules</button>
+  <input type="file" id="import-rules" accept=".json" style="display: none;">
+  <button id="import-button" class="btn btn-secondary">Import Rules</button>
+  <div id="prefill-list"></div>
+  <button id="save" class="btn">Save All</button>
+  <button id="clear" class="btn btn-danger">Clear All</button>
+  <script src="popup.js"></script>
+</body>
+</html>
