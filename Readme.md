@@ -1,4 +1,4 @@
-# 🚀 FormFiller Pro
+#  FormFiller Pro
 
 ## Supercharge Your Web Forms
 
@@ -6,12 +6,9 @@ FormFiller Pro is an advanced Chrome extension that revolutionizes the way you i
 
 ### 🌟 Key Features
 
-- **🧠 Intelligent Form Detection**: Automatically identifies and fills out forms across various websites.
-- **🔍 Smart Selector Technology**: Uses advanced CSS selectors to accurately target form fields.
 - **📊 Rule Management**: Easily add, edit, and delete prefill rules through an intuitive interface.
 - **🔎 Search Functionality**: Quickly find and manage your prefill rules.
 - **💾 Import/Export**: Share your rule sets or back them up with easy JSON import/export.
-- **🔒 Privacy First**: All data is stored locally in your browser for maximum privacy.
 - **🎛️ Granular Control**: Enable or disable the extension with a single click.
 
 ### 🚀 Getting Started
