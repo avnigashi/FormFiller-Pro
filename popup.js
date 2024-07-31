@@ -1,22 +1,26 @@
-let prefillRules = [];
+let prefillRules = {};
+let currentDomain = '';
 let isExtensionEnabled = true;
 
 function updatePrefillList() {
   const prefillList = document.getElementById('prefill-list');
   const searchTerm = document.getElementById('search').value.toLowerCase();
   prefillList.innerHTML = '';
-  prefillRules.forEach((rule, index) => {
-    if (rule.selector.toLowerCase().includes(searchTerm) || rule.value.toLowerCase().includes(searchTerm)) {
-      const item = document.createElement('div');
-      item.className = 'prefill-item';
-      item.innerHTML = `
-        <span>${rule.selector}: ${rule.value}</span>
-        <button class="edit-btn" data-index="${index}">Edit</button>
-        <button class="delete-btn" data-index="${index}">Delete</button>
-      `;
-      prefillList.appendChild(item);
-    }
-  });
+  
+  if (prefillRules[currentDomain]) {
+    prefillRules[currentDomain].forEach((rule, index) => {
+      if (rule.selector.toLowerCase().includes(searchTerm) || rule.value.toLowerCase().includes(searchTerm)) {
+        const item = document.createElement('div');
+        item.className = 'prefill-item';
+        item.innerHTML = `
+          <span>${rule.selector}: ${rule.value}</span>
+          <button class="edit-btn" data-index="${index}">Edit</button>
+          <button class="delete-btn" data-index="${index}">Delete</button>
+        `;
+        prefillList.appendChild(item);
+      }
+    });
+  }
 }
 
 function savePrefillRules() {
@@ -26,11 +30,14 @@ function savePrefillRules() {
 }
 
 function addRule(selector, value) {
-  const existingRule = prefillRules.find(rule => rule.selector === selector);
+  if (!prefillRules[currentDomain]) {
+    prefillRules[currentDomain] = [];
+  }
+  const existingRule = prefillRules[currentDomain].find(rule => rule.selector === selector);
   if (existingRule) {
     existingRule.value = value;
   } else {
-    prefillRules.push({selector, value});
+    prefillRules[currentDomain].push({selector, value});
   }
   updatePrefillList();
 }
@@ -63,13 +70,20 @@ document.addEventListener('DOMContentLoaded', function() {
   const exportButton = document.getElementById('export-rules');
   const importButton = document.getElementById('import-button');
   const importInput = document.getElementById('import-rules');
+  const currentDomainElement = document.getElementById('current-domain');
 
-  chrome.storage.sync.get(['prefillRules', 'isExtensionEnabled'], function(data) {
-    prefillRules = data.prefillRules || [];
-    isExtensionEnabled = data.isExtensionEnabled !== undefined ? data.isExtensionEnabled : true;
-    toggleExtension.checked = isExtensionEnabled;
-    toggleStatus.textContent = isExtensionEnabled ? 'Extension Enabled' : 'Extension Disabled';
-    updatePrefillList();
+  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+    const url = new URL(tabs[0].url);
+    currentDomain = url.hostname;
+    currentDomainElement.textContent = `Current Domain: ${currentDomain}`;
+
+    chrome.storage.sync.get(['prefillRules', 'isExtensionEnabled'], function(data) {
+      prefillRules = data.prefillRules || {};
+      isExtensionEnabled = data.isExtensionEnabled !== undefined ? data.isExtensionEnabled : true;
+      toggleExtension.checked = isExtensionEnabled;
+      toggleStatus.textContent = isExtensionEnabled ? 'Extension Enabled' : 'Extension Disabled';
+      updatePrefillList();
+    });
   });
 
   addButton.addEventListener('click', function() {
@@ -90,7 +104,7 @@ document.addEventListener('DOMContentLoaded', function() {
   saveButton.addEventListener('click', savePrefillRules);
 
   clearButton.addEventListener('click', function() {
-    prefillRules = [];
+    prefillRules[currentDomain] = [];
     updatePrefillList();
     savePrefillRules();
   });
@@ -99,7 +113,8 @@ document.addEventListener('DOMContentLoaded', function() {
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
       chrome.tabs.sendMessage(tabs[0].id, {action: "getCurrentInputs"}, function(response) {
         if (response && response.inputs) {
-          response.inputs.forEach(input => addRule(input.selector, input.value));
+          prefillRules[currentDomain] = response.inputs;
+          updatePrefillList();
           savePrefillRules();
         }
       });
@@ -107,7 +122,7 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   removeAllButton.addEventListener('click', function() {
-    prefillRules = [];
+    prefillRules = {};
     updatePrefillList();
     savePrefillRules();
   });
@@ -115,14 +130,14 @@ document.addEventListener('DOMContentLoaded', function() {
   prefillList.addEventListener('click', function(e) {
     if (e.target.classList.contains('delete-btn')) {
       const index = e.target.getAttribute('data-index');
-      prefillRules.splice(index, 1);
+      prefillRules[currentDomain].splice(index, 1);
       updatePrefillList();
     } else if (e.target.classList.contains('edit-btn')) {
       const index = e.target.getAttribute('data-index');
-      const rule = prefillRules[index];
+      const rule = prefillRules[currentDomain][index];
       selectorInput.value = rule.selector;
       valueInput.value = rule.value;
-      prefillRules.splice(index, 1);
+      prefillRules[currentDomain].splice(index, 1);
       updatePrefillList();
     }
   });

@@ -1,14 +1,15 @@
-// Set to store elements that have been prefilled
 const prefilledElements = new WeakSet();
 
 function prefillInputs() {
+  const currentDomain = window.location.hostname;
   chrome.storage.sync.get(['prefillRules', 'isExtensionEnabled'], function(data) {
-    const prefillRules = data.prefillRules || [];
+    const prefillRules = data.prefillRules || {};
     const isExtensionEnabled = data.isExtensionEnabled !== undefined ? data.isExtensionEnabled : true;
     
     if (!isExtensionEnabled) return;
 
-    prefillRules.forEach(function(rule) {
+    const domainRules = prefillRules[currentDomain] || [];
+    domainRules.forEach(function(rule) {
       const elements = document.querySelectorAll(rule.selector);
       elements.forEach(function(element) {
         if ((element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') && !prefilledElements.has(element)) {
@@ -86,6 +87,6 @@ observer.observe(document.body, { childList: true, subtree: true });
 // Listen for messages from the popup
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   if (request.action === "getCurrentInputs") {
-    sendResponse({inputs: getCurrentInputs()});
+    sendResponse({inputs: getCurrentInputs(), domain: window.location.hostname});
   }
 });
