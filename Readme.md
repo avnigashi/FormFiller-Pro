@@ -1,8 +1,6 @@
-#  FormFiller Pro
+#  Chrome FormPrefiller 
 
-## Supercharge Your Web Forms
-
-FormFiller Pro is an advanced Chrome extension that revolutionizes the way you interact with web forms. Say goodbye to repetitive data entry and hello to smart, adaptive form filling!
+FormFiller is an Chrome extension that prefills makes it possible to saves the status of all forms. Say goodbye to repetitive data entry and hello to smart, adaptive form filling!
 
 ### 🌟 Key Features
 
